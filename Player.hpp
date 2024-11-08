@@ -1,11 +1,11 @@
 #ifndef JOUEUR_H_INCLUDED
 #define JOUEUR_H_INCLUDED
-#include "color.h"
+#include "Color.hpp"
 
 class Player{
     private:
-        int tileExchange; //Coupon d'échange
-        int stone; // Carré cailloux
+        int tileExchange; //Coupon d'Ã©change
+        int stone; // Carre cailloux
         int robbery; //Vole la case
         std::string name;
         Color color;
@@ -14,6 +14,7 @@ class Player{
         Player();
         void displayPlayerInfo();
         ~Player();
+        std::string getPlayerName();
         void show_text(std::string text);
 };
 
@@ -26,6 +27,9 @@ Player::Player() {
     stone = 0;
     robbery = 0 ;
 
+}
+std::string Player::getPlayerName(){
+    return name;
 }
 
 Player::~Player() {}

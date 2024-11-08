@@ -3,16 +3,16 @@
 #include <map>
 
 class Color{
-private:
-    std::string colorName;
-public:
-    Color();
-    void askColor();
-    std::map<std::string, std::string> allColors; //dictionnaire
-    void initColors();
-    void showColorizedText(std::string text);
-    std::string getColorName();
-    ~Color();
+    private:
+        std::string colorName;
+    public:
+        std::map<std::string, std::string> allColors; //dictionnaire
+        void showColorizedText(std::string text);
+        Color();
+        void askColor();
+        void initColors();
+        std::string getColorName();
+        ~Color();
 };
 
 
