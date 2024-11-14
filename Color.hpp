@@ -21,7 +21,7 @@ Color::Color(){
 };
 
 Color::~Color(){
-    std::cout<< colorName <<" plus utlisisé, destruction" << std::endl;
+    std::cout<< colorName <<" plus utlisise, destruction" << std::endl;
 };
 
 void Color::askColor(){

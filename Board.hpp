@@ -2,19 +2,23 @@
 #define BOARD_H_INCLUDED
 #include "Game.hpp"
 #include <vector>
-
+#include <cstdlib>
+#include <utility>
+#include <math.h>
 
 class Board{
     private:
         int columns;
         int lines;
-        std::vector<std::vector<int>> board;
     public:
+        std::vector<std::vector<int>> board;
         Board();
         Board(int numbersOfPlayers);
         ~Board();
         void initBoard(int numbersOfPlayer);
         void displayBoard();
+        std::pair<int,int> randomNumber();
+        void implementeCaseBonus(int numbersOfPlayer);
 };
 
 Board::Board() {
@@ -39,6 +43,37 @@ void Board::initBoard(int numbersOfPlayer){
         std::cout << "Trop de joueurs";
     }
     board.resize(columns, std::vector<int>(lines, 0));
+}
+
+std::pair<int,int> Board::randomNumber() {
+    int randomColumn = rand() % (this->columns-1) - 2 ;
+    int randomLine = rand() % (this->lines-1) - 2 ;
+    return std::make_pair(randomColumn, randomLine);
+}
+
+void Board::implementeCaseBonus(int numbersOfPlayer){
+    int numberEchange = ceil(numbersOfPlayer * 1.5);
+    for (int i  = 0 ; i < numberEchange ; i++){ // échange
+        auto pos = this->randomNumber();
+        int x = pos.first;
+        int y = pos.second;
+        board[y][x] = 2;
+    }
+    numberEchange = ceil(numbersOfPlayer * 0.5);
+    for (int i  = 0 ; i < numberEchange ; i++){ // cailloux
+        auto pos = this->randomNumber();
+        int x = pos.first;
+        int y = pos.second;
+        board[y][x] = 3;
+    }
+        numberEchange = ceil(numbersOfPlayer * 1);
+    for (int i  = 0 ; i < numberEchange ; i++){ // vol
+        auto pos = this->randomNumber();
+        int x = pos.first;
+        int y = pos.second;
+        board[y][x] = 4;  //peut etre opti grace au liste
+    }
+    
 }
 
 void Board::displayBoard(){

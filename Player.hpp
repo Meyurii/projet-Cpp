@@ -1,6 +1,9 @@
 #ifndef JOUEUR_H_INCLUDED
 #define JOUEUR_H_INCLUDED
 #include "Color.hpp"
+#include <string>
+#include <iostream>
+
 
 class Player{
     private:
@@ -9,16 +12,22 @@ class Player{
         int robbery; //Vole la case
         std::string name;
         Color color;
+        int idPlayerBoard;
 
     public:
-        Player();
+        int getIdPlayer();
+        Player(int id);
         void displayPlayerInfo();
         ~Player();
         std::string getPlayerName();
         void show_text(std::string text);
 };
 
-Player::Player() {
+
+ int Player::getIdPlayer(){
+        return idPlayerBoard;
+ }
+Player::Player(int id) {
     std::cout << "Bonjour ! Quel est votre nom de joueur ?" << std::endl;
     std::cin >> name ;
     std::cout << "Tres bien " << name << ". ";
@@ -26,8 +35,10 @@ Player::Player() {
     tileExchange = 1;
     stone = 0;
     robbery = 0 ;
+    idPlayerBoard = id + 10;
 
 }
+
 std::string Player::getPlayerName(){
     return name;
 }

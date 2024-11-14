@@ -5,9 +5,8 @@
 
 int main()
 {
-
-    // faire une boucle while pour le nombre de tour avec boucle for pour chauqe jouer pour chaque tour
     Game game;
+    game.run();
     // std::string text = "bhevbehbvhbvehbvre";
     // player.show_text(text);
     // player.displayPlayerInfo();
