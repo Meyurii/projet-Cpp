@@ -43,13 +43,15 @@ void Board::initBoard(int numbersOfPlayer){
         std::cout << "Trop de joueurs";
     }
     board.resize(columns, std::vector<int>(lines, 0));
+    board.implementeCaseBonus(numbersOfPlayer);
 }
 
-std::pair<int,int> Board::randomNumber() {
-    int randomColumn = rand() % (this->columns-1) - 2 ;
-    int randomLine = rand() % (this->lines-1) - 2 ;
+std::pair<int, int> Board::randomNumber() {
+    int randomColumn = 2 + rand() % (this->columns - 3);  // Entre 2 et columns-2
+    int randomLine = 2 + rand() % (this->lines - 3);      // Entre 2 et lines-2
     return std::make_pair(randomColumn, randomLine);
 }
+
 
 void Board::implementeCaseBonus(int numbersOfPlayer){
     int numberEchange = ceil(numbersOfPlayer * 1.5);
