@@ -38,11 +38,13 @@ void Game::firstTile(int idPlayerBoard){
 
 void Game::run(){
     int tour = 0;
+    board.displayBoard();
     while (tour < 9 ){
         for ( int playerTour = 0 ; playerTour < numberOfPlayer; playerTour++){ //chaque tour des player
-             
-            board.displayBoard();
+
+            
         }
+        
         tour += 1;
     }
 }

@@ -43,7 +43,7 @@ void Board::initBoard(int numbersOfPlayer){
         std::cout << "Trop de joueurs";
     }
     board.resize(columns, std::vector<int>(lines, 0));
-    board.implementeCaseBonus(numbersOfPlayer);
+    implementeCaseBonus(numbersOfPlayer);
 }
 
 std::pair<int, int> Board::randomNumber() {
@@ -75,7 +75,7 @@ void Board::implementeCaseBonus(int numbersOfPlayer){
         int y = pos.second;
         board[y][x] = 4;  //peut etre opti grace au liste
     }
-    
+
 }
 
 void Board::displayBoard(){

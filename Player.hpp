@@ -35,7 +35,7 @@ Player::Player(int id) {
     tileExchange = 1;
     stone = 0;
     robbery = 0 ;
-    idPlayerBoard = id + 10;
+    idPlayerBoard = id + 11;
 
 }
 
