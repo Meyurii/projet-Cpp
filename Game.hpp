@@ -3,6 +3,7 @@
 #include "Player.hpp"
 #include "Board.hpp"
 #include <vector>
+#include "Tiles.hpp"
 
 
 class Game{
@@ -10,12 +11,13 @@ class Game{
         int numberOfPlayer;
         std::vector<Player> listOfPlayer;
         Board board;
+        //Tile tile;
     public:
         int getNumbersOfPlayer();
         void run();
         void initGamePlayer(int numberOfPlayer);
-        Game();
         void firstTile(int idPlayerBoard);
+        Game();
         ~Game();
 
     };
@@ -24,7 +26,7 @@ int Game::getNumbersOfPlayer(){
     return numberOfPlayer;
 }
 
-void Game::firstTile(int idPlayerBoard){
+void Game::firstTile(int idPlayerBoard) {
     int column;
     int line;
     std::cout << "Ou voulez-vous commencer ? ";

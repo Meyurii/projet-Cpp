@@ -15,11 +15,11 @@ class Player{
         int idPlayerBoard;
 
     public:
-        int getIdPlayer();
         Player(int id);
-        void displayPlayerInfo();
         ~Player();
+        int getIdPlayer();
         std::string getPlayerName();
+        void displayPlayerInfo();
         void show_text(std::string text);
 };
 
