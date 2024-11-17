@@ -21,10 +21,14 @@ class Player{
         std::string getPlayerName();
         void displayPlayerInfo();
         void show_text(std::string text);
+        Color getColor();
 };
 
+Color Player::getColor() {
+    return color;
+}
 
- int Player::getIdPlayer(){
+int Player::getIdPlayer(){
         return idPlayerBoard;
  }
 Player::Player(int id) {

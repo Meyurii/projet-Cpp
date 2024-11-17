@@ -21,7 +21,6 @@ Color::Color(){
 };
 
 Color::~Color(){
-    std::cout<< colorName <<" plus utlisise, destruction" << std::endl;
 };
 
 void Color::askColor(){
@@ -44,7 +43,7 @@ void Color::initColors() {
 
 void Color::showColorizedText(std::string text){
     std::string message = "\033[" + allColors[colorName] + "m" + text +"\033[0m";
-    std::cout << message << std::endl;
+    std::cout << message;
 }
 
 std::string Color::getColorName() {

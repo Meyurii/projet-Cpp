@@ -2,8 +2,9 @@
 #define GAME_H_INCLUDED
 #include "Player.hpp"
 #include "Board.hpp"
-#include <vector>
 #include "Tiles.hpp"
+#include <vector>
+
 
 
 class Game{
@@ -11,12 +12,17 @@ class Game{
         int numberOfPlayer;
         std::vector<Player> listOfPlayer;
         Board board;
-        //Tile tile;
+        Tile tile;
+        std::vector<std::vector<int>> currentTile;
     public:
         int getNumbersOfPlayer();
         void run();
         void initGamePlayer(int numberOfPlayer);
         void firstTile(int idPlayerBoard);
+        void DisplayCurrentTile();
+        void rotate90();
+        bool canPlaceTile(int centerX, int centerY, int idPlayer);
+        void PlaceTile(int centerX, int centerY, int idPlayer);
         Game();
         ~Game();
 
@@ -38,13 +44,22 @@ void Game::firstTile(int idPlayerBoard) {
 }
 
 
-void Game::run(){
+void Game::run() {
     int tour = 0;
-    board.displayBoard();
+    bool canPlace;
+    board.displayBoard(listOfPlayer);
     while (tour < 9 ){
-        for ( int playerTour = 0 ; playerTour < numberOfPlayer; playerTour++){ //chaque tour des player
-
-            
+        for ( int player = 0 ; player < numberOfPlayer; player++){ //chaque tour des player
+            currentTile = tile.GetTiles()[0];
+            DisplayCurrentTile();
+            board.displayBoard(listOfPlayer);
+            int x;
+            std::cin >> x;
+            int y;
+            std::cin >> y;
+            canPlace = canPlaceTile(x, y, listOfPlayer[player].getIdPlayer());
+            if (canPlace)
+                PlaceTile(x, y, listOfPlayer[player].getIdPlayer());
         }
         
         tour += 1;
@@ -57,7 +72,20 @@ Game::Game() {
     std::cin >> numberOfPlayer ;
     board = Board(numberOfPlayer);
     initGamePlayer(numberOfPlayer);
+    tile = Tile();
 }
+
+void Game::DisplayCurrentTile()
+{
+    for (const auto& line : currentTile) {  // Utiliser 'const auto&' pour éviter la copie
+        for (const auto& column : line) {  // Si 'piece' est un vecteur, nous devons l'itérer aussi
+            std::cout << column;  // Afficher chaque valeur de l'élément
+        }
+        std::cout << std::endl;
+    }
+}
+
+
 
 void Game::initGamePlayer(int numberOfPlayer){
     
@@ -73,6 +101,74 @@ void Game::initGamePlayer(int numberOfPlayer){
     }
     
 }
+
+void Game::rotate90() {
+    int size = currentTile.size();
+    std::vector<std::vector<int>> rotated(size, std::vector<int>(size, 0));
+    for (int i = 0; i < size; ++i) {
+        for (int j = 0; j < size; ++j) {
+            rotated[j][size - i - 1] = currentTile[i][j];
+        }
+    }
+    currentTile = rotated;
+}
+
+bool Game::canPlaceTile(int centerX, int centerY, int idPlayer) {
+    int size = currentTile.size();
+    int boardHeight = board.board.size();
+    int boardWidth = board.board[0].size();
+    bool touchesIdPlayer = false;
+
+    for (int i = 0; i < size; ++i) {
+        for (int j = 0; j < size; ++j) {
+            // récupere l'index sur le tableau du coté haut gauche
+            int x = centerX + (i - size / 2); // haut
+            int y = centerY + (j - size / 2); // gauche
+
+            if (currentTile[i][j] != 0) {
+                if (x < 0 || x >= boardHeight || y < 0 || y >= boardWidth) {
+                    return false;
+                }
+
+                if (board.board[x][y] == 1 || (board.board[x][y] >= 10 && board.board[x][y] != idPlayer)) { // verifie si case est deja occupée par une autre forme ou par un id player different de celui du player actuel
+                    return false;
+                }
+
+                if ((x + 1 < boardHeight && board.board[x + 1][y] == idPlayer) || 
+                    (x - 1 >= 0 && board.board[x - 1][y] == idPlayer) ||          
+                    (y + 1 < boardWidth && board.board[x][y + 1] == idPlayer) ||  
+                    (y - 1 >= 0 && board.board[x][y - 1] == idPlayer)) { // verifie si adjacent quelque part
+                    touchesIdPlayer = true;
+                }
+
+                if ((x + 1 < boardHeight && board.board[x + 1][y] >= 10 && board.board[x + 1][y] != idPlayer) ||
+                    (x - 1 >= 0 && board.board[x - 1][y] >= 10 && board.board[x - 1][y] != idPlayer) ||
+                    (y + 1 < boardWidth && board.board[x][y + 1] >= 10 && board.board[x][y + 1] != idPlayer) ||
+                    (y - 1 >= 0 && board.board[x][y - 1] >= 10 && board.board[x][y - 1] != idPlayer)) { // verifie si un des adjacent est un adversaire en prenant en compte les cas d'erreur
+                    return false;
+                }
+            }
+        }
+    }
+
+    return touchesIdPlayer;
+}
+
+void Game::PlaceTile(int centerX, int centerY, int idPlayer) {
+    int size = currentTile.size();
+
+    for (int i = 0; i < size; ++i) {
+        for (int j = 0; j < size; ++j) {
+            int x = centerX + (i - size / 2);
+            int y = centerY + (j - size / 2);
+
+            if (currentTile[i][j] != 0) {
+                board.board[x][y] = idPlayer;
+            }
+        }
+    }
+}
+
 
 Game::~Game() {
 

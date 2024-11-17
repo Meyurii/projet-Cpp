@@ -18,7 +18,7 @@ public:
     Board(int numbersOfPlayers);
     ~Board();
     void initBoard(int numbersOfPlayer);
-    void displayBoard();
+    void displayBoard(std::vector<Player> listOfPlayer);
     std::pair<int, int> randomNumber();
     void implementeCaseBonus(int numbersOfPlayer);
 };
@@ -75,22 +75,34 @@ void Board::implementeCaseBonus(int numbersOfPlayer) {
     }
 }
 
-void Board::displayBoard() {
+void Board::displayBoard(std::vector<Player> listOfPlayer) {
     std::cout << "   "; 
+    bool isPlayer = false;
     for (int column = 0; column < columns; column++) {
         std::cout << std::setw(3) << column; 
     }
     std::cout << "\n";
 
     for (int line = 0; line < lines; line++) {
+        isPlayer = false;
         std::cout << std::setw(3) << line; 
         for (int column = 0; column < columns; column++) {
+            isPlayer = false;
             char cell = '.';
             if (board[line][column] == 2) cell = 'E'; // échange
             else if (board[line][column] == 3) cell = 'C'; // cailloux
             else if (board[line][column] == 4) cell = 'V'; // vol
 
-            std::cout << std::setw(3) << cell; 
+            for (int playerIndex = 0; playerIndex < listOfPlayer.size(); playerIndex++) {
+                if (board[line][column] == listOfPlayer[playerIndex].getIdPlayer()) {
+                    std::cout << std::setw(3);
+                    listOfPlayer[playerIndex].getColor().showColorizedText("  J");
+                    isPlayer = true;
+                    break;
+                }
+            }
+            if (isPlayer == false)
+                std::cout << std::setw(3) << cell;
         }
         std::cout << "\n";
     }

@@ -2,24 +2,46 @@
 #define TILE_HPP
 
 #include <vector>
-#include "Color.hpp"
+
 
 class Tile {
     private:
         std::vector<std::vector<std::vector<int>>> listTile;
-        //std::vector<std::vector<std::vector<int>> randomTile;
+        std::vector<std::vector<std::vector<int>>> randomTile;
+        std::vector<int> usedTiles;
     public:
         Tile();
         ~Tile();
         void SetTiles();
-        //void randomTile();
-
-
+        void SetRandomTile();
+        void display();
+        std::vector<std::vector<std::vector<int>>> GetTiles();
 };
 
 Tile::Tile(){
     this->SetTiles();
+    this->SetRandomTile();
+};
+
+Tile::~Tile(){}
+
+std::vector<std::vector<std::vector<int>>> Tile::GetTiles(){
+    return randomTile;
+};
+
+
+void Tile::SetRandomTile() {
+    for (int i = 0; i < 96; i++) {
+        int randomIndex = rand() % listTile.size(); 
+        randomTile.push_back(listTile[randomIndex]);
+        listTile.erase(listTile.begin() + randomIndex);
+    }
 }
+
+
+
+
+
 
 void Tile::SetTiles(){
     listTile = 
@@ -697,6 +719,6 @@ void Tile::SetTiles(){
 }
 
 
-//1
+
 
 #endif // TILES_HPP
