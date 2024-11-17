@@ -21,6 +21,7 @@ public:
     void displayBoard(std::vector<Player> listOfPlayer);
     std::pair<int, int> randomNumber();
     void implementeCaseBonus(int numbersOfPlayer);
+    void checkAndActivateBonus(int playerID, int x, int y);
 };
 
 Board::Board() {}
@@ -28,6 +29,9 @@ Board::Board() {}
 Board::Board(int numbersOfPlayers) {
     initBoard(numbersOfPlayers);
 }
+
+
+
 
 void Board::initBoard(int numbersOfPlayer) {
     if (numbersOfPlayer <= 1) {

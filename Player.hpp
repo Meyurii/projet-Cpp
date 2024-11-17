@@ -13,9 +13,17 @@ class Player{
         std::string name;
         Color color;
         int idPlayerBoard;
+        int squareSize;
+        int maxSize;
 
     public:
+        void setMaxSize(int max);
+        int getMaxSize();
+        void setSquareMax(int max);
+        int getSquareMax();
+        Player() : tileExchange(0), stone(0), robbery(0), idPlayerBoard(0), squareSize(0), maxSize(0) {};
         Player(int id);
+        Player(const Player& other);
         ~Player();
         int getIdPlayer();
         std::string getPlayerName();
@@ -23,6 +31,21 @@ class Player{
         void show_text(std::string text);
         Color getColor();
 };
+
+int Player::getMaxSize(){
+    return maxSize;
+}
+
+int Player::getSquareMax(){
+    return squareSize;
+}
+void Player::setMaxSize(int max){
+    maxSize = max;
+}
+
+void Player::setSquareMax(int max){
+    squareSize = max;
+}
 
 Color Player::getColor() {
     return color;
@@ -41,6 +64,17 @@ Player::Player(int id) {
     robbery = 0 ;
     idPlayerBoard = id + 11;
 
+}
+
+Player::Player(const Player& other) {
+    name = other.name;
+    color = other.color;
+    tileExchange = other.tileExchange;
+    stone = other.stone;
+    robbery = other.robbery;
+    idPlayerBoard = other.idPlayerBoard;
+    squareSize = other.squareSize;
+    maxSize = other.maxSize;
 }
 
 std::string Player::getPlayerName(){

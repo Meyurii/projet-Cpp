@@ -14,6 +14,7 @@ class Game{
         Board board;
         Tile tile;
         std::vector<std::vector<int>> currentTile;
+        Player posibleWinner;
     public:
         int getNumbersOfPlayer();
         void run();
@@ -25,6 +26,11 @@ class Game{
         void PlaceTile(int centerX, int centerY, int idPlayer);
         Game();
         ~Game();
+        void displayTiles();
+        void printPossiblePositions(int idPlayer);
+        int getBiggestSquare(int idPlayer);
+        int getBiggestPlace(int idPlayer);
+        void Winner();
 
     };
 
@@ -43,37 +49,92 @@ void Game::firstTile(int idPlayerBoard) {
     board.board[line][column] = idPlayerBoard;
 }
 
-
-void Game::run() {
-    int tour = 0;
-    bool canPlace;
-    board.displayBoard(listOfPlayer);
-    while (tour < 9 ){
-        for ( int player = 0 ; player < numberOfPlayer; player++){ //chaque tour des player
-            currentTile = tile.GetTiles()[0];
-            DisplayCurrentTile();
-            board.displayBoard(listOfPlayer);
-            int x;
-            std::cin >> x;
-            int y;
-            std::cin >> y;
-            canPlace = canPlaceTile(x, y, listOfPlayer[player].getIdPlayer());
-            if (canPlace)
-                PlaceTile(x, y, listOfPlayer[player].getIdPlayer());
+void Game::displayTiles() {
+    std::cout << "Tuile actuelle :" << std::endl;
+    DisplayCurrentTile();
+    int size = tile.GetTiles().size();
+    std::cout << "\nProchaines tuiles :" << std::endl;
+    for (int i = 1; i < std::min(6, size); ++i) {
+        for (const auto& row : tile.GetTiles()[i]) {
+            for (int cell : row) {
+                std::cout << (cell ? "#" : " ");
+            }
+            std::cout << std::endl;
         }
-        
-        tour += 1;
+        std::cout << std::endl;
     }
 }
 
 
+void Game::run() {
+    // placement starting tuiles
+    for (int i = 0; i < numberOfPlayer; i++) {
+        firstTile(listOfPlayer[i].getIdPlayer());
+    }
+
+    board.displayBoard(listOfPlayer);
+
+    int tour = 0;
+    bool canPlace;
+    while (tour < 9) {
+        std::cout << "tour : " << tour << std::endl;
+        for (int player = 0; player < numberOfPlayer; player++) {
+            std::cout << "player : " << player << std::endl;
+            currentTile = tile.GetTiles()[0];
+            displayTiles(); // affichage tuile actuelle et prochaines tuiles
+            printPossiblePositions(listOfPlayer[player].getIdPlayer());
+            int x, y;
+            std::cout << listOfPlayer[player].getPlayerName() << ", entrer les coordonees pour placer votre tuile en x: ";
+            std::cin >> x ;
+            std::cout << "Et en y: ";
+            std::cin >> y;
+            canPlace = canPlaceTile(x, y, listOfPlayer[player].getIdPlayer());
+            if (canPlace) {
+                PlaceTile(x, y, listOfPlayer[player].getIdPlayer());
+                board.displayBoard(listOfPlayer);
+
+                tile.popFirstTile(); 
+                if (!tile.GetTiles().empty()) {
+                    currentTile = tile.GetTiles()[0]; 
+                } else {
+                    std::cout << "Plus de tuile disponible.\n";
+                }
+            } else {
+                std::cout << "Placement invalide. Reesayer.\n";
+                player--; 
+            }
+        }
+        tour += 1;
+    }
+    std::cout << "fin de la partie" << std::endl;
+    Winner();
+    std::cout << "Le gagnant est " << posibleWinner.getPlayerName() << " ! Felicitation !";
+}
+
+
+void Game::printPossiblePositions(int idPlayer) {
+    int boardHeight = board.board.size();
+    int boardWidth = board.board[0].size();
+    std::cout << "Voici les positions possibles: " << idPlayer << ":\n";
+
+    for (int x = 0; x < boardHeight; ++x) {
+        for (int y = 0; y < boardWidth; ++y) {
+            if (canPlaceTile(x, y, idPlayer)) {
+                std::cout << "Position: (" << x << ", " << y << ")\n";
+            }
+        }
+    }
+}
+
 Game::Game() {
-    std::cout<< "Bienvenue dans ce jeu ! Combien de joueurs etes vous ? ";
-    std::cin >> numberOfPlayer ;
+    std::cout << "Bienvenue dans ce jeu ! Combien de joueurs etes vous ? ";
+    std::cin >> numberOfPlayer;
     board = Board(numberOfPlayer);
     initGamePlayer(numberOfPlayer);
     tile = Tile();
+    posibleWinner = Player();
 }
+
 
 void Game::DisplayCurrentTile()
 {
@@ -87,19 +148,12 @@ void Game::DisplayCurrentTile()
 
 
 
-void Game::initGamePlayer(int numberOfPlayer){
-    
-    for (int i = 0 ; i < numberOfPlayer; i++)
-    {
+void Game::initGamePlayer(int numberOfPlayer) {
+    for (int i = 0; i < numberOfPlayer; i++) {
         Player player(i);
         listOfPlayer.push_back(player);
-        std::cout << player.getPlayerName() << " bien ajouter a la liste des joueurs\n";
+        std::cout << player.getPlayerName() << " a été ajouté à la liste des joueurs.\n";
     }
-     for (int i = 0 ; i < numberOfPlayer; i++)
-    {
-        firstTile(listOfPlayer[i].getIdPlayer());
-    }
-    
 }
 
 void Game::rotate90() {
@@ -130,7 +184,7 @@ bool Game::canPlaceTile(int centerX, int centerY, int idPlayer) {
                     return false;
                 }
 
-                if (board.board[x][y] == 1 || (board.board[x][y] >= 10 && board.board[x][y] != idPlayer)) { // verifie si case est deja occupée par une autre forme ou par un id player different de celui du player actuel
+                if (board.board[x][y] == 1 || (board.board[x][y] >= 10)) { // verifie si case est deja occupée par une autre forme ou par un id player different de celui du player actuel
                     return false;
                 }
 
@@ -169,7 +223,71 @@ void Game::PlaceTile(int centerX, int centerY, int idPlayer) {
     }
 }
 
+void Game::Winner(){
+    posibleWinner = listOfPlayer[0];
+    int idPosibleWinner = listOfPlayer[0].getIdPlayer();
+    listOfPlayer[0].setSquareMax(getBiggestSquare(idPosibleWinner));
+    for (int player = 0; player < listOfPlayer.size(); player++){
+        int idPlayer = listOfPlayer[player].getIdPlayer();
+        listOfPlayer[player].setSquareMax(getBiggestSquare(idPlayer));
+        if(listOfPlayer[player].getSquareMax() > posibleWinner.getSquareMax()){
+            posibleWinner = listOfPlayer[player];
+            idPosibleWinner = idPlayer;
+        } else if (listOfPlayer[player].getSquareMax() == posibleWinner.getSquareMax()){
+            listOfPlayer[player].setMaxSize(getBiggestPlace(idPlayer));
+            posibleWinner.setMaxSize(getBiggestPlace(idPosibleWinner));
+            if(listOfPlayer[player].getMaxSize() > posibleWinner.getMaxSize()){
+                posibleWinner = listOfPlayer[player];
+                idPosibleWinner = idPlayer;
+            }
+        }
+    }
+}
 
+int Game::getBiggestSquare(int idPlayer){
+    int squarePosX;
+    int squareY;
+    int sizeOfSquare = 1;
+    int sizeOfTempSquare = 0;
+    bool coorectSquare = true;
+    for(int line = 0; line < board.board.size(); line++){
+        for(int colonne = 0; colonne < board.board.size(); colonne++){
+            if(board.board[line][colonne] == idPlayer){
+                do
+                {
+                    sizeOfTempSquare = sizeOfSquare;
+                    if (line + sizeOfSquare >= board.board.size() || colonne + sizeOfSquare >= board.board[0].size()) {
+                        coorectSquare = false;
+                        break;
+                    }
+                    coorectSquare = true;
+                    for (int tempLine = 0 ; tempLine != sizeOfSquare ; tempLine++) {
+                        for (int tempColonne = 0 ; tempColonne != sizeOfSquare ; tempColonne++) {
+                            if (board.board[line + tempLine][colonne + tempColonne] != idPlayer)
+                                coorectSquare = false;
+                        }
+                    }
+                    if (coorectSquare == true) {
+                        sizeOfSquare += 1;
+                    }
+                } while (sizeOfTempSquare < sizeOfSquare);
+            }
+        }
+    }
+    return sizeOfSquare;
+}
+
+int Game::getBiggestPlace(int idPlayer){
+    int maxSize;
+    for(int line = 0; line < board.board.size(); line++){
+        for(int colonne = 0; colonne < board.board.size(); colonne++){
+            if(board.board[line][colonne] == idPlayer){
+                maxSize += 1;
+            }
+        }
+    } 
+    return maxSize;   
+}
 Game::~Game() {
 
 }

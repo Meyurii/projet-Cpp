@@ -15,6 +15,7 @@ class Tile {
         void SetTiles();
         void SetRandomTile();
         void display();
+        void popFirstTile();
         std::vector<std::vector<std::vector<int>>> GetTiles();
 };
 
@@ -29,6 +30,9 @@ std::vector<std::vector<std::vector<int>>> Tile::GetTiles(){
     return randomTile;
 };
 
+void Tile::popFirstTile() {
+    randomTile.erase(randomTile.begin());
+}
 
 void Tile::SetRandomTile() {
     for (int i = 0; i < 96; i++) {
