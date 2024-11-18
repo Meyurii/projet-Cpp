@@ -17,6 +17,9 @@ class Tile {
         void display();
         void popFirstTile();
         std::vector<std::vector<std::vector<int>>> GetTiles();
+        void SetTiles(const std::vector<std::vector<std::vector<int>>>& newTiles) {
+        randomTile = newTiles;
+    }
 };
 
 Tile::Tile(){
