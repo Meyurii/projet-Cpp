@@ -41,6 +41,7 @@ int Game::getNumbersOfPlayer(){
 void Game::firstTile(int idPlayerBoard) {
     int column;
     int line;
+    board.displayBoard(listOfPlayer);
     std::cout << "Ou voulez-vous commencer ? ";
     std::cout << "La colonne : ";
     std::cin >> column;
