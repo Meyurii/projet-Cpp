@@ -79,7 +79,7 @@ void Game::run() {
     while (tour < 9) {
         std::cout << "tour : " << tour << std::endl;
         for (int player = 0; player < numberOfPlayer; player++) {
-            std::cout << "player : " << player << std::endl;
+            std::cout << "player : " << listOfPlayer[player].getPlayerName() << std::endl;
             currentTile = tile.GetTiles()[0];
             displayTiles(); // affichage tuile actuelle et prochaines tuiles
             std::cout << "Voulez-vous modfier la piece ? (y/n) ";
