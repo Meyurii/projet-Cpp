@@ -94,6 +94,8 @@ void Board::displayBoard(std::vector<Player> listOfPlayer) {
             isPlayer = false;
             char cell = '.';
             if (board[line][column] == 2) cell = 'E'; // échange
+            else if(board[line][column] == 100) cell = 'X'; //bloquer par cailloux
+            else if(board[line][column] == 8) cell = 'N'; //neutre
             else if (board[line][column] == 3) cell = 'C'; // cailloux
             else if (board[line][column] == 4) cell = 'V'; // vol
 
