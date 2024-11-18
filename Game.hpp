@@ -15,6 +15,7 @@ class Game{
         Tile tile;
         std::vector<std::vector<int>> currentTile;
         Player posibleWinner;
+        std::vector<int> exchangeCoupons;
     public:
         int getNumbersOfPlayer();
         void run();
@@ -31,7 +32,12 @@ class Game{
         int getBiggestSquare(int idPlayer);
         int getBiggestPlace(int idPlayer);
         void Winner();
-
+        bool isStoneSquareActivated(int x, int y, int idPlayer);
+        void placeStoneTile();
+        void initExchangeCoupons();
+        bool useExchangeCoupon(int playerId);
+        void reorganizeTiles(int chosenTileIndex);
+        
     };
 
 int Game::getNumbersOfPlayer(){
@@ -77,34 +83,58 @@ void Game::run() {
     char answer;
     int tour = 0;
     bool canPlace;
+    initExchangeCoupons();
     while (tour < 9) {
         std::cout << "tour : " << tour << std::endl;
         for (int player = 0; player < numberOfPlayer; player++) {
             std::cout << "player : " << listOfPlayer[player].getPlayerName() << std::endl;
             currentTile = tile.GetTiles()[0];
             displayTiles(); // affichage tuile actuelle et prochaines tuiles
+            
+            char exchangeAnswer;
+            std::cout << "Voulez-vous utiliser un coupon echange? (nombre de coupons echange " 
+                      << exchangeCoupons[player] << ") (y/n) ";
+            std::cin >> exchangeAnswer;
+
+            if (exchangeAnswer == 'y' && useExchangeCoupon(player)) {
+                displayTiles();
+                
+                int chosenTileIndex;
+                std::cout << "Choisissez une tuile parmi les 5 prochaines (1-5): ";
+                std::cin >> chosenTileIndex;
+                chosenTileIndex = std::max(1, std::min(5, chosenTileIndex)) - 1; 
+
+                reorganizeTiles(chosenTileIndex); 
+                currentTile = tile.GetTiles()[0]; 
+                
+                std::cout << "Tuile actuelle et les prochaines tuiles apres reorganisation :\n";
+                displayTiles(); // Rremontrer les tuiles apres coupon 
+            }
+
             std::cout << "Voulez-vous modfier la piece ? (y/n) ";
-            std::cin >> answer ;
-            if (answer == 'y'){
-                std::cout << "Pour tourner a droite taper d, pour la retourner taper r, pour la tourner a gauche taper g";
+            std::cin >> answer;
+            if (answer == 'y') {
+                std::cout << "Pour tourner a droite taper d, pour la retourner taper r, pour la tourner a gauche taper g: ";
                 std::cin >> answer;
-                if(answer == 'd'){
+                if (answer == 'd') {
                     rotate90();
-                }else if (answer == 'r'){
+                } else if (answer == 'r') {
                     rotate90();
                     rotate90();
-                }else{
+                } else {
                     rotate90();
                     rotate90();
                     rotate90();
                 }
             }
+
             printPossiblePositions(listOfPlayer[player].getIdPlayer());
             int x, y;
-            std::cout << listOfPlayer[player].getPlayerName() << ", entrer les coordonees pour placer votre tuile en x: ";
-            std::cin >> x ;
+            std::cout << listOfPlayer[player].getPlayerName() << ", entrer les coordonnees pour placer votre tuile en x: ";
+            std::cin >> x;
             std::cout << "Et en y: ";
             std::cin >> y;
+
             canPlace = canPlaceTile(x, y, listOfPlayer[player].getIdPlayer());
             if (canPlace) {
                 PlaceTile(x, y, listOfPlayer[player].getIdPlayer());
@@ -129,6 +159,7 @@ void Game::run() {
 }
 
 
+
 void Game::printPossiblePositions(int idPlayer) {
     int boardHeight = board.board.size();
     int boardWidth = board.board[0].size();
@@ -143,6 +174,55 @@ void Game::printPossiblePositions(int idPlayer) {
     }
 }
 
+bool Game::isStoneSquareActivated(int x, int y, int idPlayer) {
+    if (x < 0 || x >= board.board.size() || y < 0 || y >= board.board[0].size()) 
+        return false;
+
+    // verifier si la cas est entourer
+    return (x > 0 && board.board[x - 1][y] == idPlayer) &&
+           (x < board.board.size() - 1 && board.board[x + 1][y] == idPlayer) &&
+           (y > 0 && board.board[x][y - 1] == idPlayer) &&
+           (y < board.board[0].size() - 1 && board.board[x][y + 1] == idPlayer);
+}
+
+void Game::placeStoneTile() {
+    int x, y;
+
+    do {
+        std::cout << "Choose a location to place your stone tile (x y): ";
+        std::cin >> x >> y;
+    } while (x < 0 || x >= board.board.size() || y < 0 || y >= board.board[0].size() || board.board[x][y] != 0);
+
+    board.board[x][y] = -1; 
+    std::cout << "Stone tile placed at (" << x << ", " << y << ")." << std::endl;
+}
+
+void Game::initExchangeCoupons() {
+    exchangeCoupons.resize(numberOfPlayer, 1); // chaque joueur commence avec un coupon 
+}
+
+bool Game::useExchangeCoupon(int playerId) {
+    if (exchangeCoupons[playerId] > 0) {
+        exchangeCoupons[playerId]--;
+        return true;
+    }
+    return false;
+}
+
+void Game::reorganizeTiles(int chosenTileIndex) {
+    std::vector<std::vector<std::vector<int>>> tilesQueue = tile.GetTiles();
+    std::vector<std::vector<int>> chosenTile = tilesQueue[chosenTileIndex];
+    
+    tilesQueue.erase(tilesQueue.begin() + chosenTileIndex);
+    tilesQueue.insert(tilesQueue.begin(), chosenTile);
+    
+    for (int i = 1; i < chosenTileIndex; i++) {
+        tilesQueue.push_back(tilesQueue[1]);
+        tilesQueue.erase(tilesQueue.begin() + 1);
+    }
+    
+    tile.SetTiles(tilesQueue);
+}
 Game::Game() {
     std::cout << "Bienvenue dans ce jeu ! Combien de joueurs etes vous ? ";
     std::cin >> numberOfPlayer;
