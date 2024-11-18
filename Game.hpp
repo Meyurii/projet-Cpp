@@ -15,45 +15,83 @@ class Game{
         Tile tile;
         std::vector<std::vector<int>> currentTile;
         Player posibleWinner;
-        std::vector<int> exchangeCoupons;
     public:
         int getNumbersOfPlayer();
         void run();
         void initGamePlayer(int numberOfPlayer);
-        void firstTile(int idPlayerBoard);
+        void firstTile(int idPlayerBoard, int player);
         void DisplayCurrentTile();
         void rotate90();
         bool canPlaceTile(int centerX, int centerY, int idPlayer);
         void PlaceTile(int centerX, int centerY, int idPlayer);
+        void extraBonus(int player,int idPlayer);
         Game();
         ~Game();
         void displayTiles();
-        void printPossiblePositions(int idPlayer);
+        void printPossiblePositions(int idPlayer, int player);
         int getBiggestSquare(int idPlayer);
         int getBiggestPlace(int idPlayer);
         void Winner();
-        bool isStoneSquareActivated(int x, int y, int idPlayer);
+        bool isStoneSquareActivated(int idPlayer);
         void placeStoneTile();
-        void initExchangeCoupons();
-        bool useExchangeCoupon(int playerId);
+        bool useExchangeCoupon(int player);
         void reorganizeTiles(int chosenTileIndex);
+        bool isExchangeSquareActivated(int idPlayer);
+        void activeExchange(int player, int idPlayer);
         
     };
 
+bool Game::isExchangeSquareActivated(int idPlayer){
+    for(int i = 0; i < board.board.size(); i++){
+        for(int j = 0; j < board.board.size(); j++){
+            if(board.board[i][j] == 2){
+                if(board.board[i+1][j] ==idPlayer && board.board[i-1][j] == idPlayer && board.board[i][j+1] == idPlayer && board.board[i][j-1] == idPlayer){
+                    board.board[i][j] = 8 ;
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}
+
+void Game::activeExchange(int player, int idPlayer){
+    if (isExchangeSquareActivated(idPlayer)){
+        int value = listOfPlayer[player].getTitleExchange();
+        listOfPlayer[player].setTitleExchange(value);
+
+    }
+}
 int Game::getNumbersOfPlayer(){
     return numberOfPlayer;
 }
 
-void Game::firstTile(int idPlayerBoard) {
+void Game::firstTile(int idPlayerBoard,int player) {
     int column;
     int line;
     board.displayBoard(listOfPlayer);
-    std::cout << "Ou voulez-vous commencer ? ";
-    std::cout << "La colonne : ";
+
+    std::cout << "Ou voulez-vous commencer " << listOfPlayer[player].getPlayerName();
+    std::cout << "\nLa colonne : ";
     std::cin >> column;
     std::cout << "La ligne : ";
     std::cin >> line;
     board.board[line][column] = idPlayerBoard;
+}
+
+void Game::extraBonus(int player,int idPlayer) {
+    int column;
+    int line;
+    board.displayBoard(listOfPlayer);
+    std::cout << listOfPlayer[player].getPlayerName()<<" il vous reste " << listOfPlayer[player].getTitleExchange() << "coupons d'échange. \n Posez une tuile de 1x1" << std::endl;
+    std::cout << "\nLa colonne : ";
+    std::cin >> column;
+    std::cout << "La ligne : ";
+    std::cin >> line;
+    board.board[line][column] = idPlayer;
+    int value = listOfPlayer[player].getTitleExchange() - 1;
+    listOfPlayer[player].setTitleExchange(value);
+
 }
 
 void Game::displayTiles() {
@@ -76,16 +114,15 @@ void Game::displayTiles() {
 void Game::run() {
     // placement starting tuiles
     for (int i = 0; i < numberOfPlayer; i++) {
-        firstTile(listOfPlayer[i].getIdPlayer());
+        firstTile(listOfPlayer[i].getIdPlayer(), i );
     }
 
     board.displayBoard(listOfPlayer);
     char answer;
     int tour = 0;
     bool canPlace;
-    initExchangeCoupons();
     while (tour < 9) {
-        std::cout << "tour : " << tour << std::endl;
+        std::cout << "tour : " << tour+1 << std::endl;
         for (int player = 0; player < numberOfPlayer; player++) {
             std::cout << "player : " << listOfPlayer[player].getPlayerName() << std::endl;
             currentTile = tile.GetTiles()[0];
@@ -93,7 +130,7 @@ void Game::run() {
             
             char exchangeAnswer;
             std::cout << "Voulez-vous utiliser un coupon echange? (nombre de coupons echange " 
-                      << exchangeCoupons[player] << ") (y/n) ";
+                      << listOfPlayer[player].getTitleExchange() << ") (y/n) ";
             std::cin >> exchangeAnswer;
 
             if (exchangeAnswer == 'y' && useExchangeCoupon(player)) {
@@ -128,7 +165,7 @@ void Game::run() {
                 }
             }
 
-            printPossiblePositions(listOfPlayer[player].getIdPlayer());
+            printPossiblePositions(listOfPlayer[player].getIdPlayer(), player);
             int x, y;
             std::cout << listOfPlayer[player].getPlayerName() << ", entrer les coordonnees pour placer votre tuile en x: ";
             std::cin >> x;
@@ -150,20 +187,31 @@ void Game::run() {
                 std::cout << "Placement invalide. Reesayer.\n";
                 player--; 
             }
+            activeExchange(player, listOfPlayer[player].getIdPlayer());
+            if(isStoneSquareActivated(listOfPlayer[player].getIdPlayer())){
+                placeStoneTile();
+            }
         }
         tour += 1;
+        
     }
-    std::cout << "fin de la partie" << std::endl;
+    std::cout << "Fin de la partie. Si des joueurs ont encore des coupons, le moment est venue de les jouer. " << std::endl;
+    for(int player = 0; player < numberOfPlayer; player++){
+        int value = listOfPlayer[player].getTitleExchange();
+        while(value =! 0){
+            extraBonus(player,listOfPlayer[player].getIdPlayer());
+        }
+    }
     Winner();
     std::cout << "Le gagnant est " << posibleWinner.getPlayerName() << " ! Felicitation !";
 }
 
 
 
-void Game::printPossiblePositions(int idPlayer) {
+void Game::printPossiblePositions(int idPlayer, int player) {
     int boardHeight = board.board.size();
     int boardWidth = board.board[0].size();
-    std::cout << "Voici les positions possibles: " << idPlayer << ":\n";
+    std::cout << "Voici les positions possibles pour : " << listOfPlayer[player].getPlayerName()<< ":\n";
 
     for (int x = 0; x < boardHeight; ++x) {
         for (int y = 0; y < boardWidth; ++y) {
@@ -174,36 +222,35 @@ void Game::printPossiblePositions(int idPlayer) {
     }
 }
 
-bool Game::isStoneSquareActivated(int x, int y, int idPlayer) {
-    if (x < 0 || x >= board.board.size() || y < 0 || y >= board.board[0].size()) 
-        return false;
-
-    // verifier si la cas est entourer
-    return (x > 0 && board.board[x - 1][y] == idPlayer) &&
-           (x < board.board.size() - 1 && board.board[x + 1][y] == idPlayer) &&
-           (y > 0 && board.board[x][y - 1] == idPlayer) &&
-           (y < board.board[0].size() - 1 && board.board[x][y + 1] == idPlayer);
+bool Game::isStoneSquareActivated(int idPlayer){
+    for(int i = 0; i < board.board.size(); i++){
+        for(int j = 0; j < board.board.size(); j++){
+            if(board.board[i][j] == 3){
+                if(board.board[i+1][j] ==idPlayer && board.board[i-1][j] == idPlayer && board.board[i][j+1] == idPlayer && board.board[i][j-1] == idPlayer){
+                    board.board[i][j] = 8 ;
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
 }
 
 void Game::placeStoneTile() {
-    int x, y;
-
-    do {
-        std::cout << "Choose a location to place your stone tile (x y): ";
-        std::cin >> x >> y;
-    } while (x < 0 || x >= board.board.size() || y < 0 || y >= board.board[0].size() || board.board[x][y] != 0);
-
-    board.board[x][y] = -1; 
-    std::cout << "Stone tile placed at (" << x << ", " << y << ")." << std::endl;
+    int x;
+    int y;
+    std::cout << "Bravo ! Vous avez un coupon Stone ! Vous pouvez bloquer n'importe quelle case (1x1) ! Quelle coordonné voulez-vous bloqué ? " <<std::endl;
+    std::cout << "en x: ";
+    std::cin >> x;
+    std::cout << "En y: ";
+    std::cin >> y;
+    board.board[x][y] = 100;
 }
 
-void Game::initExchangeCoupons() {
-    exchangeCoupons.resize(numberOfPlayer, 1); // chaque joueur commence avec un coupon 
-}
-
-bool Game::useExchangeCoupon(int playerId) {
-    if (exchangeCoupons[playerId] > 0) {
-        exchangeCoupons[playerId]--;
+bool Game::useExchangeCoupon(int player) {
+    if (listOfPlayer[player].getTitleExchange() > 0) {
+        int value = listOfPlayer[player].getTitleExchange() - 1;
+        listOfPlayer[player].setTitleExchange(value);
         return true;
     }
     return false;
@@ -253,6 +300,8 @@ void Game::initGamePlayer(int numberOfPlayer) {
     }
 }
 
+
+
 void Game::rotate90() {
     int size = currentTile.size();
     std::vector<std::vector<int>> rotated(size, std::vector<int>(size, 0));
@@ -282,6 +331,9 @@ bool Game::canPlaceTile(int centerX, int centerY, int idPlayer) {
                 }
 
                 if (board.board[x][y] == 1 || (board.board[x][y] >= 10)) { // verifie si case est deja occupée par une autre forme ou par un id player different de celui du player actuel
+                    return false;
+                }
+                if(board.board[x][y] == 100){ //empeche de jouer sur cailloux
                     return false;
                 }
 
