@@ -73,7 +73,7 @@ void Game::run() {
     }
 
     board.displayBoard(listOfPlayer);
-
+    char answer;
     int tour = 0;
     bool canPlace;
     while (tour < 9) {
@@ -82,6 +82,22 @@ void Game::run() {
             std::cout << "player : " << player << std::endl;
             currentTile = tile.GetTiles()[0];
             displayTiles(); // affichage tuile actuelle et prochaines tuiles
+            std::cout << "Voulez-vous modfier la piece ? (y/n) ";
+            std::cin >> answer ;
+            if (answer == 'y'){
+                std::cout << "Pour tourner a droite taper d, pour la retourner taper r, pour la tourner a gauche taper g";
+                std::cin >> answer;
+                if(answer == 'd'){
+                    rotate90();
+                }else if (answer == 'r'){
+                    rotate90();
+                    rotate90();
+                }else{
+                    rotate90();
+                    rotate90();
+                    rotate90();
+                }
+            }
             printPossiblePositions(listOfPlayer[player].getIdPlayer());
             int x, y;
             std::cout << listOfPlayer[player].getPlayerName() << ", entrer les coordonees pour placer votre tuile en x: ";
