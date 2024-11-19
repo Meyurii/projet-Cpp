@@ -64,27 +64,19 @@ Color Player::getColor() {
 int Player::getIdPlayer(){
         return idPlayerBoard;
  }
+
+// constructeur avec l'id
 Player::Player(int id) {
     std::cout << "Bonjour ! Quel est votre nom de joueur ?" << std::endl;
-    std::cin >> name ;
-    std::cout << "Tres bien " << name << ". ";
+    std::cin >> name;
+    std::cout << "Très bien " << name << ". ";
     color.askColor();
-    tileExchange = 1;
+    tileExchange = 1; // debute avec 1 coupon
     stone = 0;
-    robbery = 0 ;
+    robbery = 0;
     idPlayerBoard = id + 11;
-
-}
-
-Player::Player(const Player& other) {
-    name = other.name;
-    color = other.color;
-    tileExchange = other.tileExchange;
-    stone = other.stone;
-    robbery = other.robbery;
-    idPlayerBoard = other.idPlayerBoard;
-    squareSize = other.squareSize;
-    maxSize = other.maxSize;
+    squareSize = 0;
+    maxSize = 0;
 }
 
 std::string Player::getPlayerName(){
