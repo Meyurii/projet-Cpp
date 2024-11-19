@@ -214,6 +214,10 @@ void Game::placeStoneTile() {
     board.board[x][y] = 100;
 }
 
+void Game::initExchangeCoupons() {
+    exchangeCoupons.resize(numberOfPlayer, 1); // chaque joueur commence avec un coupon 
+}
+
 bool Game::useExchangeCoupon(int player) {
     if (listOfPlayer[player].getTitleExchange() > 0) {
         int value = listOfPlayer[player].getTitleExchange() - 1;
