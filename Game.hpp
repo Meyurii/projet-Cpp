@@ -38,8 +38,42 @@ class Game{
         void reorganizeTiles(int chosenTileIndex);
         bool isExchangeSquareActivated(int idPlayer);
         void activeExchange(int player, int idPlayer);
-        
+        bool isRobberryActivated(int idPlayer);
+        void activeRobery(int idPlayer);
     };
+
+bool Game::isRobberryActivated(int idPlayer){
+    for(int i = 0; i < board.board.size(); i++){
+        for(int j = 0; j < board.board.size(); j++){
+            if(board.board[i][j] == 4){
+                if(board.board[i+1][j] ==idPlayer && board.board[i-1][j] == idPlayer && board.board[i][j+1] == idPlayer && board.board[i][j-1] == idPlayer){
+                    board.board[i][j] = 8 ;
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}
+
+void Game::activeRobery(int idPlayer){
+    if(isRobberryActivated(idPlayer)){
+            int x;
+            int y;
+            std::cout << "Bravo ! Vous avez un coupon Vol ! Tu peux jouer sur n'importe quelle case (même celle d'un adversaire) (1x1) !\n Celui ne pourra récuperé sa case seulement grace a un autre coupon Vol !\n Quelle coordonné voulez-vous bloqué ? " <<std::endl;
+            std::cout << "en x: ";
+            std::cin >> x;
+            std::cout << "En y: ";
+            std::cin >> y;
+            if( board.board[x][y] != idPlayer &&  board.board[x][y] == 0){
+                board.board[x][y] = idPlayer;
+            }else{
+                std::cout << "Coordonné invalide. Veuillez jouer sur la case d'un joueur";
+                activeRobery(idPlayer);
+            }
+            
+    }
+}
 
 bool Game::isExchangeSquareActivated(int idPlayer){
     for(int i = 0; i < board.board.size(); i++){
@@ -95,7 +129,6 @@ void Game::extraBonus(int player,int idPlayer) {
 }
 
 void Game::displayTiles() {
-    std::cout << "Tuile actuelle :" << std::endl;
     DisplayCurrentTile();
     int size = tile.GetTiles().size();
     std::cout << "\nProchaines tuiles :" << std::endl;
@@ -183,13 +216,14 @@ void Game::run() {
                 } else {
                     std::cout << "Plus de tuile disponible.\n";
                 }
+                activeRobery(listOfPlayer[player].getIdPlayer());
+                activeExchange(player, listOfPlayer[player].getIdPlayer());
+                if(isStoneSquareActivated(listOfPlayer[player].getIdPlayer())){
+                    placeStoneTile();
+                }
             } else {
                 std::cout << "Placement invalide. Reesayer.\n";
                 player--; 
-            }
-            activeExchange(player, listOfPlayer[player].getIdPlayer());
-            if(isStoneSquareActivated(listOfPlayer[player].getIdPlayer())){
-                placeStoneTile();
             }
         }
         tour += 1;
@@ -280,11 +314,21 @@ Game::Game() {
 }
 
 
-void Game::DisplayCurrentTile()
-{
-    for (const auto& line : currentTile) {  // Utiliser 'const auto&' pour éviter la copie
-        for (const auto& column : line) {  // Si 'piece' est un vecteur, nous devons l'itérer aussi
-            std::cout << column;  // Afficher chaque valeur de l'élément
+void Game::DisplayCurrentTile() {
+    int size = currentTile.size();
+    int center = size / 2; // pour determiner le centre de la liste
+    std::cout << "Tuile Actuelle:\n";
+
+    for (int i = 0; i < size; ++i) {
+        for (int j = 0; j < size; ++j) {
+            if (i == center && j == center) {
+                // centre de la liste en rouge
+                std::cout << "\033[1;31m"; 
+                std::cout << (currentTile[i][j] == 1 ? "#" : ".");
+                std::cout << "\033[0m"; // reset la couleur
+            } else {
+                std::cout << (currentTile[i][j] == 1 ? "#" : "");
+            }
         }
         std::cout << std::endl;
     }
@@ -296,7 +340,6 @@ void Game::initGamePlayer(int numberOfPlayer) {
     for (int i = 0; i < numberOfPlayer; i++) {
         Player player(i);
         listOfPlayer.push_back(player);
-        std::cout << player.getPlayerName() << " a été ajouté à la liste des joueurs.\n";
     }
 }
 
