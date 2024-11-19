@@ -60,7 +60,7 @@ void Game::activeRobery(int idPlayer){
     if(isRobberryActivated(idPlayer)){
             int x;
             int y;
-            std::cout << "Bravo ! Vous avez un coupon Vol ! Tu peux jouer sur n'importe quelle case (même celle d'un adversaire) (1x1) !\n Celui ne pourra récuperé sa case seulement grace a un autre coupon Vol !\n Quelle coordonné voulez-vous bloqué ? " <<std::endl;
+            std::cout << "Bravo ! Vous avez un coupon Vol ! Tu peux jouer sur n'importe quelle case (même celle d'un adversaire) (1x1) !\n Celui ne pourra recupere sa case seulement grace a un autre coupon Vol !\n Quelle coordonne voulez-vous bloque ? " <<std::endl;
             std::cout << "en x: ";
             std::cin >> x;
             std::cout << "En y: ";
@@ -68,7 +68,7 @@ void Game::activeRobery(int idPlayer){
             if( board.board[x][y] != idPlayer &&  board.board[x][y] == 0){
                 board.board[x][y] = idPlayer;
             }else{
-                std::cout << "Coordonné invalide. Veuillez jouer sur la case d'un joueur";
+                std::cout << "Coordonne invalide. Veuillez jouer sur la case d'un joueur";
                 activeRobery(idPlayer);
             }
             
@@ -117,7 +117,7 @@ void Game::extraBonus(int player,int idPlayer) {
     int column;
     int line;
     board.displayBoard(listOfPlayer);
-    std::cout << listOfPlayer[player].getPlayerName()<<" il vous reste " << listOfPlayer[player].getTitleExchange() << "coupons d'échange. \n Posez une tuile de 1x1" << std::endl;
+    std::cout << listOfPlayer[player].getPlayerName()<<" il vous reste " << listOfPlayer[player].getTitleExchange() << "coupons d'echange. \n Posez une tuile de 1x1" << std::endl;
     std::cout << "\nLa colonne : ";
     std::cin >> column;
     std::cout << "La ligne : ";
@@ -273,7 +273,7 @@ bool Game::isStoneSquareActivated(int idPlayer){
 void Game::placeStoneTile() {
     int x;
     int y;
-    std::cout << "Bravo ! Vous avez un coupon Stone ! Vous pouvez bloquer n'importe quelle case (1x1) ! Quelle coordonné voulez-vous bloqué ? " <<std::endl;
+    std::cout << "Bravo ! Vous avez un coupon Stone ! Vous pouvez bloquer n'importe quelle case (1x1) ! Quelle coordonne voulez-vous bloque ? " <<std::endl;
     std::cout << "en x: ";
     std::cin >> x;
     std::cout << "En y: ";
