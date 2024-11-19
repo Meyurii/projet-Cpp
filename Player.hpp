@@ -73,7 +73,6 @@ Player::Player(int id) {
     stone = 0;
     robbery = 0 ;
     idPlayerBoard = id + 11;
-
 }
 
 Player::Player(const Player& other) {

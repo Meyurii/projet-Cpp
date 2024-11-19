@@ -15,26 +15,27 @@ class Game{
         Tile tile;
         std::vector<std::vector<int>> currentTile;
         Player posibleWinner;
+        std::vector<int> exchangeCoupons;
     public:
         int getNumbersOfPlayer();
         void run();
         void initGamePlayer(int numberOfPlayer);
-        void firstTile(int idPlayerBoard, int player);
+        void firstTile(int idPlayerBoard);
         void DisplayCurrentTile();
         void rotate90();
         bool canPlaceTile(int centerX, int centerY, int idPlayer);
         void PlaceTile(int centerX, int centerY, int idPlayer);
-        void extraBonus(int player,int idPlayer);
         Game();
         ~Game();
         void displayTiles();
-        void printPossiblePositions(int idPlayer, int player);
+        void printPossiblePositions(int idPlayer);
         int getBiggestSquare(int idPlayer);
         int getBiggestPlace(int idPlayer);
         void Winner();
-        bool isStoneSquareActivated(int idPlayer);
+        bool isStoneSquareActivated(int x, int y, int idPlayer);
         void placeStoneTile();
-        bool useExchangeCoupon(int player);
+        void initExchangeCoupons();
+        bool useExchangeCoupon(int playerId);
         void reorganizeTiles(int chosenTileIndex);
         bool isExchangeSquareActivated(int idPlayer);
         void activeExchange(int player, int idPlayer);
@@ -100,13 +101,11 @@ int Game::getNumbersOfPlayer(){
     return numberOfPlayer;
 }
 
-void Game::firstTile(int idPlayerBoard,int player) {
+void Game::firstTile(int idPlayerBoard) {
     int column;
     int line;
-    board.displayBoard(listOfPlayer);
-
-    std::cout << "Ou voulez-vous commencer " << listOfPlayer[player].getPlayerName();
-    std::cout << "\nLa colonne : ";
+    std::cout << "Ou voulez-vous commencer ? ";
+    std::cout << "La colonne : ";
     std::cin >> column;
     std::cout << "La ligne : ";
     std::cin >> line;
@@ -147,15 +146,16 @@ void Game::displayTiles() {
 void Game::run() {
     // placement starting tuiles
     for (int i = 0; i < numberOfPlayer; i++) {
-        firstTile(listOfPlayer[i].getIdPlayer(), i );
+        firstTile(listOfPlayer[i].getIdPlayer());
     }
 
     board.displayBoard(listOfPlayer);
     char answer;
     int tour = 0;
     bool canPlace;
+    initExchangeCoupons();
     while (tour < 9) {
-        std::cout << "tour : " << tour+1 << std::endl;
+        std::cout << "tour : " << tour << std::endl;
         for (int player = 0; player < numberOfPlayer; player++) {
             std::cout << "player : " << listOfPlayer[player].getPlayerName() << std::endl;
             currentTile = tile.GetTiles()[0];
@@ -163,7 +163,7 @@ void Game::run() {
             
             char exchangeAnswer;
             std::cout << "Voulez-vous utiliser un coupon echange? (nombre de coupons echange " 
-                      << listOfPlayer[player].getTitleExchange() << ") (y/n) ";
+                      << exchangeCoupons[player] << ") (y/n) ";
             std::cin >> exchangeAnswer;
 
             if (exchangeAnswer == 'y' && useExchangeCoupon(player)) {
@@ -198,7 +198,7 @@ void Game::run() {
                 }
             }
 
-            printPossiblePositions(listOfPlayer[player].getIdPlayer(), player);
+            printPossiblePositions(listOfPlayer[player].getIdPlayer());
             int x, y;
             std::cout << listOfPlayer[player].getPlayerName() << ", entrer les coordonnees pour placer votre tuile en x: ";
             std::cin >> x;
@@ -227,25 +227,18 @@ void Game::run() {
             }
         }
         tour += 1;
-        
     }
-    std::cout << "Fin de la partie. Si des joueurs ont encore des coupons, le moment est venue de les jouer. " << std::endl;
-    for(int player = 0; player < numberOfPlayer; player++){
-        int value = listOfPlayer[player].getTitleExchange();
-        while(value =! 0){
-            extraBonus(player,listOfPlayer[player].getIdPlayer());
-        }
-    }
+    std::cout << "fin de la partie" << std::endl;
     Winner();
     std::cout << "Le gagnant est " << posibleWinner.getPlayerName() << " ! Felicitation !";
 }
 
 
 
-void Game::printPossiblePositions(int idPlayer, int player) {
+void Game::printPossiblePositions(int idPlayer) {
     int boardHeight = board.board.size();
     int boardWidth = board.board[0].size();
-    std::cout << "Voici les positions possibles pour : " << listOfPlayer[player].getPlayerName()<< ":\n";
+    std::cout << "Voici les positions possibles: " << idPlayer << ":\n";
 
     for (int x = 0; x < boardHeight; ++x) {
         for (int y = 0; y < boardWidth; ++y) {
@@ -279,6 +272,10 @@ void Game::placeStoneTile() {
     std::cout << "En y: ";
     std::cin >> y;
     board.board[x][y] = 100;
+}
+
+void Game::initExchangeCoupons() {
+    exchangeCoupons.resize(numberOfPlayer, 1); // chaque joueur commence avec un coupon 
 }
 
 bool Game::useExchangeCoupon(int player) {
@@ -329,6 +326,21 @@ void Game::DisplayCurrentTile() {
             } else {
                 std::cout << (currentTile[i][j] == 1 ? "#" : "");
             }
+void Game::DisplayCurrentTile() {
+    int size = currentTile.size();
+    int center = size / 2; // pour determiner le centre de la liste
+    std::cout << "Tuile Actuelle:\n";
+
+    for (int i = 0; i < size; ++i) {
+        for (int j = 0; j < size; ++j) {
+            if (i == center && j == center) {
+                // centre de la liste en rouge
+                std::cout << "\033[1;31m"; 
+                std::cout << (currentTile[i][j] == 1 ? "#" : ".");
+                std::cout << "\033[0m"; // reset la couleur
+            } else {
+                std::cout << (currentTile[i][j] == 1 ? "#" : "");
+            }
         }
         std::cout << std::endl;
     }
@@ -342,8 +354,6 @@ void Game::initGamePlayer(int numberOfPlayer) {
         listOfPlayer.push_back(player);
     }
 }
-
-
 
 void Game::rotate90() {
     int size = currentTile.size();
@@ -374,9 +384,6 @@ bool Game::canPlaceTile(int centerX, int centerY, int idPlayer) {
                 }
 
                 if (board.board[x][y] == 1 || (board.board[x][y] >= 10)) { // verifie si case est deja occupée par une autre forme ou par un id player different de celui du player actuel
-                    return false;
-                }
-                if(board.board[x][y] == 100){ //empeche de jouer sur cailloux
                     return false;
                 }
 
