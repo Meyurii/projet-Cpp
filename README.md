@@ -166,7 +166,12 @@ Vous aurez ensuite le choix d'échanger la pièce avec une de la file d'attente.
 <img src="4.png"/>
 Les possibilités de placement seront écrite afin de vous aider. De plus, les coordonés qui vous sont demandé est celle du # rouge ou du point rouge qui vous sert de repère. Vous n'aurez plus qu'a rentré votre colonne puis la ligne.
 
-
 La partie se termine après 9 tours.
 À la fin, les joueurs peuvent utiliser leurs coupons d’échange pour acheter des tuiles 1x1 supplémentaires et les placer sur la grille.
 Le gagnant est le joueur avec le plus grand carré. En cas d’égalité, le joueur ayant le plus de tuiles gagne.
+<img src="winner.jpg">
+
+# 🫂 Groupes
+
+- Atticus AUERBACH
+- Alicia MARTIN PRUDHON
